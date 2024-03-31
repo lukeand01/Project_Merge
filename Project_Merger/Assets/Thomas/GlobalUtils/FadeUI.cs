@@ -11,12 +11,25 @@ public class FadeUI : MonoBehaviour
     [SerializeField] AnimationCurve alphaColorCurve;
     [SerializeField] AnimationCurve scaleCurve;
     [SerializeField] AnimationCurve heightCurve;
-    float time;
+
+
+
+    float timeForColor;
+    float timeForColorModifier = 1;
+
+    float timeForScale;
+    float timeForScaleModifier = 1;
+
+    float timeForHeight;
+    float timeForHeightModifier = 1;
+
 
 
     Vector3 origin;
     Vector3 originalScale;
     Camera cam;
+
+    [SerializeField] bool debugDoesNotFade;
 
     bool isReusable;
 
@@ -33,13 +46,21 @@ public class FadeUI : MonoBehaviour
     private void Update()
     {
         if (text == null) return;
+        if (debugDoesNotFade) return;
 
-        text.color = new Color(text.color.r, text.color.g, text.color.b, alphaColorCurve.Evaluate(time));
-        transform.localScale = originalScale * scaleCurve.Evaluate(time);
-        transform.position = origin + new Vector3(0, 0 + heightCurve.Evaluate(time), 0);
-        time += Time.deltaTime;
+        text.color = new Color(text.color.r, text.color.g, text.color.b, alphaColorCurve.Evaluate(timeForColor));
+        transform.localScale = originalScale * scaleCurve.Evaluate(timeForScale);
+        transform.position = origin + new Vector3(0, 0 + heightCurve.Evaluate(timeForHeight), 0);
 
-        if(text.color.a <= 0)
+
+        timeForColor += Time.deltaTime * timeForColorModifier;
+        timeForScale += Time.deltaTime * timeForScaleModifier;
+        timeForHeight += Time.deltaTime * timeForHeightModifier;
+
+
+
+
+        if (text.color.a <= 0)
         {
             if (isReusable) gameObject.SetActive(false);
             else Destroy(gameObject);
@@ -58,7 +79,24 @@ public class FadeUI : MonoBehaviour
         //the problem is that i dont want the fellas to overshadow each other.       
         this.text.text = text;
         this.text.color = color;
-        time = 0;
+
+        timeForColor = 0;
+        timeForScale = 0;
+        timeForHeight = 0;
        
+    }
+
+    
+    public void ChangeScaleModifier(float newValue)
+    {
+        timeForScaleModifier = newValue;
+    }
+    public void ChangeHeightModifier(float newValue)
+    {
+        timeForHeight = newValue;
+    }
+    public void ChangeColorModifier(float newValue)
+    {
+        timeForColorModifier = newValue;
     }
 }

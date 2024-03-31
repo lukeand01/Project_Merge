@@ -6,12 +6,16 @@ public class PlayerHandler : MonoBehaviour
 {
     public static PlayerHandler instance;
 
+
+    public PlayerController controller {  get; private set; }
     private void Awake()
     {
         instance = this;
+
+        controller = GetComponent<PlayerController>();
     }
 
-
+    //need to create effect for the points going up.
     public int points {  get; private set; }
 
     public void AddPoints(int value)
@@ -24,4 +28,6 @@ public class PlayerHandler : MonoBehaviour
         points -= value;
         UIHandler.instance.playerUI.UpdatePointText(points);
     }
+
+    
 }

@@ -8,10 +8,12 @@ public class UIHandler : MonoBehaviour
 
 
     public PlayerUI playerUI;
+    public ConfirmationUI confirmationUI;
+    public QueueUI queueUI;
 
     private void Awake()
     {
         instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 }

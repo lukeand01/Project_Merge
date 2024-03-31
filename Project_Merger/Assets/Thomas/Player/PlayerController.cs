@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +12,9 @@ public class PlayerController : MonoBehaviour
 
     //what it will try will be to always follow the finger.
 
+    
+
+
     private void Start()
     {
         ballHandler = GameHandler.instance.ballHandler;
@@ -18,8 +23,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
+              
         //InputControlBall();
         InputControlBallForMouse();
+        InputInteractWithBall();
     }
 
 
@@ -47,21 +55,76 @@ public class PlayerController : MonoBehaviour
 
     void InputControlBallForMouse()
     {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        if (ClickedOverUI(mousePos)) return;
+
+        if(Input.mousePosition.y > Screen.height /1.24f)
+        {
+            return;
+        }
+
+        
+
+
         if (Input.GetMouseButtonUp(0))
         {
-            Debug.Log("called");
+
+
             ballHandler.ReceiveDecisionInput();
             return;
         }
 
         if (!Input.GetMouseButton(0)) return;
 
-   
 
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
 
         ballHandler.ReceiveMoveInput(mousePos);
 
+    }
+
+    void InputInteractWithBall()
+    {
+        //this will detect if you touched a ball but only ever if there is a power that requires it.
+
+        //assing this as an event.
+
+        bool canCheckThis = Input.touchCount > 0 || Input.GetMouseButtonDown(0);
+
+        if (!canCheckThis)
+        {
+            Debug.Log("this is the problem");
+            return;
+        }
+
+
+        Debug.Log("got through this");
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+
+        //if the touch is in the toop
+
+        if (hit.collider == null) return;
+        Debug.Log("this was the object found " + hit.collider.name);
+
+        if (hit.collider.gameObject.tag != "Ball") return;
+
+        MergeBall merge = hit.collider.GetComponent<MergeBall>();
+        
+        if (merge == null) return;
+
+        //so its always a power if you are interact.
+        GameHandler.instance.powerHandler.UseCurrentPower(merge);
+
+    }
+
+
+    bool ClickedOverUI(Vector3 pos)
+    {
+        return EventSystem.current.IsPointerOverGameObject();
     }
 
 }

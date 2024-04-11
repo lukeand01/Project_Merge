@@ -94,12 +94,11 @@ public class PlayerController : MonoBehaviour
 
         if (!canCheckThis)
         {
-            Debug.Log("this is the problem");
+
             return;
         }
 
 
-        Debug.Log("got through this");
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
@@ -108,7 +107,7 @@ public class PlayerController : MonoBehaviour
         //if the touch is in the toop
 
         if (hit.collider == null) return;
-        Debug.Log("this was the object found " + hit.collider.name);
+
 
         if (hit.collider.gameObject.tag != "Ball") return;
 

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -26,13 +27,16 @@ public class MergeBall : MonoBehaviour
 
     [SerializeField] MergeBallCanvas canvas;
 
-    bool isDropped;
+    public bool isDropped;
 
-    BallHandler handler;
+    protected BallHandler handler;
 
+
+    public AudioClip mergeClip;
+    
     
 
-    public void SetUp(BallHandler handler)
+    public virtual void SetUp(BallHandler handler)
     {
 
 
@@ -41,8 +45,12 @@ public class MergeBall : MonoBehaviour
 
         isDropped = false;
 
+        circleCollider.isTrigger = false;
+        //rb2.constraints = RigidbodyConstraints2D.FreezeRotation;
+
         handler.eventBallOrder += ReceiveOrder;
 
+        
 
     }
     private void OnDestroy()
@@ -50,6 +58,13 @@ public class MergeBall : MonoBehaviour
         if(handler != null)
         {
             handler.eventBallOrder -= ReceiveOrder;
+        }
+
+        if (wasOutside)
+        {
+            //we say to inform that this thing is no longer outside.
+            GameHandler.instance.ballHandler.RemoveToOutside();
+            wasOutside = false;
         }
         
     }
@@ -59,7 +74,11 @@ public class MergeBall : MonoBehaviour
     {
 
 
-        if (!isDropped) return;
+        if (!isDropped)
+        {
+            Debug.Log("is not dropped");
+            return;
+        }
 
 
 
@@ -69,10 +88,9 @@ public class MergeBall : MonoBehaviour
             ReceiveWhatOrder(orderWhat);
             return;
         }
-        if(orderWho == OrderWhoType.AllBelow && (int)ballType > (int)mergeType)
+        if(orderWho == OrderWhoType.AllBelow && (int)ballType >= (int)mergeType)
         {
-
-
+            Debug.Log("this is below " + mergeType.ToString());
             ReceiveWhatOrder(orderWhat);
             return;
         }
@@ -92,12 +110,12 @@ public class MergeBall : MonoBehaviour
 
     void ReceiveWhatOrder(OrderWhatType orderWhat)
     {
-        if(orderWhat == OrderWhatType.Destroy)
+        if(orderWhat == OrderWhatType.Destroy && mergeType != MergeBallType.Cow)
         {
             Destroy(gameObject);
             return;
         }
-        if(orderWhat == OrderWhatType.Upgrade)
+        if(orderWhat == OrderWhatType.Upgrade && (int)mergeType > 4)
         {
             //then we call for someone in this place.
 
@@ -135,12 +153,87 @@ public class MergeBall : MonoBehaviour
         circleCollider = GetComponent<CircleCollider2D>();
 
 
+        total = 0.4f;
+        current = 0;
+
+        outsideTotal = 2;
     }
 
 
+    float current;
+    float total;
+
+
+    float outsideCurrent;
+    float outsideTotal;
+
+    bool wasOutside;
+
+    void CallOutside()
+    {
+        Debug.Log("calling this as an error");
+
+        if (!wasOutside)
+        {
+            wasOutside = true;
+            GameHandler.instance.ballHandler.AddToOutside();
+        }
+
+    }
+
+    
+
     private void Update()
     {
-        if (!mergeProcess) return;
+        
+        if(transform.localPosition.y > 650 && isDropped)
+        {
+
+            
+            if(outsideCurrent >= outsideTotal)
+            {
+                CallOutside();
+            }
+            else
+            {
+                outsideCurrent += Time.deltaTime;
+            }
+
+        }
+        else if(wasOutside)
+        {
+            //call this if none of them are affect
+            wasOutside = false;
+            GameHandler.instance.ballHandler.RemoveToOutside();
+        }
+
+        if (!mergeProcess)
+        {
+
+            if(tag == "Ball")
+            {
+                if (circleCollider.isTrigger)
+                {
+                    circleCollider.isTrigger = false;
+                    rb2.gravityScale = 1;
+                }
+
+
+
+            }
+
+            return;
+        }
+
+
+        if(mergeProcess && currentMergeTarget == null)
+        {
+            Debug.Log("there is nothing to follow");
+            mergeProcess = false;
+            circleCollider.isTrigger = false;
+            rb2.gravityScale = 1;
+        }
+
         if (mergeTarget == null) return;
 
         transform.position = Vector2.MoveTowards(transform.position, mergeTarget.transform.position, Time.deltaTime * mergeSpeed);
@@ -149,7 +242,6 @@ public class MergeBall : MonoBehaviour
 
         if(distance < 0.1f)
         {
-            Debug.Log("time to merge");
             CallMerge(mergeTarget);
         }
 
@@ -235,9 +327,38 @@ public class MergeBall : MonoBehaviour
 
     #region 2D
 
+    public bool alreadyPushedToTheSide = false;
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(mergeProcess) return;
+
+        if(!alreadyPushedToTheSide && collision.gameObject.tag == "Ball")
+        {
+            int randomSide = Random.Range(0, 2);
+
+            if (randomSide == 0)
+            {
+                rb2.AddForce(Vector3.right * 0.3f, ForceMode2D.Impulse);
+            }
+
+            if (randomSide == 1)
+            {
+                rb2.AddForce(Vector3.left * 0.3f, ForceMode2D.Impulse);
+            }
+
+            alreadyPushedToTheSide = true;
+        }
+
+        if (!isDropped) return;
+
+
+
+        HandleCollision(collision);
+    }
+
+    protected virtual void HandleCollision(Collision2D collision)
+    {
         MergeBall merge = collision.collider.GetComponent<MergeBall>();
 
         if (merge == null) return;
@@ -245,6 +366,8 @@ public class MergeBall : MonoBehaviour
         if (!merge.CanMerge((int)mergeType)) return;
 
         if (cannotCollide) return;
+
+        if (!isDropped) return;
 
         //CallMerge(merge);
         //merge.StartMergeProcess(this);
@@ -260,8 +383,19 @@ public class MergeBall : MonoBehaviour
     #endregion
 
 
-    void StartMergeProcess(MergeBall mergeTarget)
+    #region SPRITE
+    public Sprite sprite;
+
+
+    #endregion
+
+    MergeBall currentMergeTarget;
+
+    protected void StartMergeProcess(MergeBall mergeTarget)
     {
+
+        currentMergeTarget = mergeTarget;
+
         mergeProcess = true;
         this.mergeTarget = mergeTarget;
 
@@ -289,6 +423,22 @@ public class MergeBall : MonoBehaviour
     public void DebugCallFade()
     {
         GameHandler.instance.ballHandler.DebugSpawnFade(transform.position);
+    }
+
+
+
+    public void DestructionEffect()
+    {
+        rb2.gravityScale = 0;
+        StopAllCoroutines();
+        StartCoroutine(DestructionEffectProcess());
+    }
+    IEnumerator DestructionEffectProcess()
+    {
+        //it disappears and then is destroyed.
+        transform.DOScale(0, 0.3f);
+        yield return new WaitForSecondsRealtime(0.3f);
+        Destroy(gameObject);
     }
 
 }

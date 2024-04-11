@@ -61,6 +61,10 @@ PrefabInstance:
       value: BallTemplateHorse
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f2523642ceab7ac459170de8bf3382c4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f2523642ceab7ac459170de8bf3382c4, type: 3}
       propertyPath: m_TagString
       value: Ball
       objectReference: {fileID: 0}
@@ -118,9 +122,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.000065898894}
+  m_Offset: {x: 0.0000259275, y: 0.00014368036}
   serializedVersion: 2
-  m_Radius: 0.0100753475
+  m_Radius: 0.009453095
 --- !u!50 &1946309101356105847
 Rigidbody2D:
   serializedVersion: 4
@@ -135,7 +139,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0.2
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -162,6 +166,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mergeType: 8
   canvas: {fileID: 146610715773066377}
+  alreadyPushedToTheSide: 0
+  sprite: {fileID: 21300000, guid: 97a37e88cc78f8f4bb668736b9f4387c, type: 3}
 --- !u!4 &1989624151011186308 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f2523642ceab7ac459170de8bf3382c4, type: 3}
@@ -179,6 +185,10 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1264523526392167920, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4998243441919301644, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
@@ -186,6 +196,10 @@ PrefabInstance:
     - target: {fileID: 6839408687198982841, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
       propertyPath: m_Name
       value: MergeBallCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6839408687198982841, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7356014730447647322, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
       propertyPath: m_IsActive
@@ -282,6 +296,18 @@ PrefabInstance:
     - target: {fileID: 7595350698922839359, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7673313792471991706, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8208032701668451922, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8238410350293475926, guid: b83c643dd5abbe44ea37ffbc468c14d9, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -10,9 +10,12 @@ public class PlayerHandler : MonoBehaviour
     public PlayerController controller {  get; private set; }
     private void Awake()
     {
-        instance = this;
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
 
         controller = GetComponent<PlayerController>();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     //need to create effect for the points going up.
@@ -29,5 +32,15 @@ public class PlayerHandler : MonoBehaviour
         UIHandler.instance.playerUI.UpdatePointText(points);
     }
 
+    public void ResetPlayer()
+    {
+        ClearPoints();
+    }
+
+     void ClearPoints()
+    {
+        points = 0;
+        UIHandler.instance.playerUI.UpdatePointText(points);
+    }
     
 }

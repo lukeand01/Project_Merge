@@ -11,7 +11,7 @@ public class MergeBallCanvas : MonoBehaviour
 
     //these thigns must be derived from an event system. makes everything simpler rather than calling everyone.
 
-    [SerializeField] Image targetImage;
+    [SerializeField] GameObject target;
 
     float originalScale = 1;
     float alteredScale = 1.2f;
@@ -22,55 +22,25 @@ public class MergeBallCanvas : MonoBehaviour
         alteredScale = 1.1f;
     }
 
+    private void Update()
+    {
+        if (target.activeInHierarchy)
+        {
+            target.transform.Rotate(new Vector3(0, 0, 45 * Time.deltaTime));
+        }
+    }
+
+
     public void StartTarget()
     {
-        StopAllCoroutines();
-        StartCoroutine(StartTargetProcess());
+        target.SetActive(true);
     }
     public void StopTarget()
     {
-        StopAllCoroutines();
-        StopTargetProcess();
+        target.SetActive(false);
     }
 
-    IEnumerator StartTargetProcess()
-    {
-        targetImage.DOKill();
-        targetImage.transform.DOScale(0, 0);
-        targetImage.gameObject.SetActive(true);
-        targetImage.transform.DOScale(originalScale, 1);
-        yield return new WaitForSecondsRealtime(1);
-
-        StartCoroutine(TargetProcess());
-    }
-    IEnumerator StopTargetProcess()
-    {
-        targetImage.DOKill();
-        targetImage.transform.DOScale(0, 1);
-        yield return new WaitForSecondsRealtime(1);
-        targetImage.gameObject.SetActive(true);
-
-    }
-
-
-
-    IEnumerator TargetProcess()
-    {
-        targetImage.DOKill();
-        targetImage.transform.DOScale(originalScale, 0);
-
-        float timer = 1f;
-
-        targetImage.transform.DOScale(alteredScale, timer);
-
-        yield return new WaitForSecondsRealtime(timer);
-
-        targetImage.transform.DOScale(originalScale, timer);
-
-        yield return new WaitForSecondsRealtime(timer);
-
-        StartCoroutine (TargetProcess());
-    }
+    
 
 }
 

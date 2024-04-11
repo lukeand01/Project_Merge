@@ -15,12 +15,13 @@ public static class Utils
         {
             Color.red,
             Color.green,
-            Color.blue,
-            Color.yellow
+            Color.yellow,
+            
         };
         int random = Random.Range(0, colorlIst.Count);
 
         return colorlIst[random];
     }
+
 
 }

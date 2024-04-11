@@ -11,7 +11,8 @@ public class PowerHandler : MonoBehaviour
     //advance target to next level.
 
     //can never be using more than one power at  a atime.
-    
+
+
     PowerConfirmType confirmType = PowerConfirmType.None;
     enum PowerConfirmType 
     { 
@@ -20,10 +21,17 @@ public class PowerHandler : MonoBehaviour
         Upgrade
     }
 
+    
+
 
     public void StopPower()
     {
-        
+        UIHandler.instance.inputUI.StopButtonCancelPower();
+        confirmType = PowerConfirmType.None;
+
+
+        BallHandler ballHandler = GameHandler.instance.ballHandler;
+        ballHandler.OnBallOrder(MergeBallType.Rabbit, OrderWhoType.All, OrderWhatType.StopTargetUI);
     }
 
 
@@ -31,9 +39,13 @@ public class PowerHandler : MonoBehaviour
     {
         //we tell to target anyone.
         //
+
+        Debug.Log("this was called");
         BallHandler ballHandler = GameHandler.instance.ballHandler;
         ballHandler.OnBallOrder(MergeBallType.Rabbit, OrderWhoType.All, OrderWhatType.StartTargetUI);
         confirmType = PowerConfirmType.Upgrade;
+
+        UIHandler.instance.inputUI.StartButtonCancelPower();
     }
 
     public void StartDestroyTarget()
@@ -44,15 +56,16 @@ public class PowerHandler : MonoBehaviour
 
         //with this order
         confirmType = PowerConfirmType.Destroy;
-    }
 
+        UIHandler.instance.inputUI.StartButtonCancelPower();
+    }
 
 
     public void UseCurrentPower(MergeBall merge)
     {
         //we wioll give the information back here to decide what fella i started.
 
-        Debug.Log("use current power");
+
 
         if (confirmType == PowerConfirmType.None) return;
         if (merge == null) return;
@@ -63,6 +76,8 @@ public class PowerHandler : MonoBehaviour
         if(confirmType == PowerConfirmType.Destroy)
         {
             //need to call it destruction so award points
+            UIHandler.instance.inputUI.ChangeEspecificPowerAmmo(PowerType.DestroyTarget, -1);
+            UIHandler.instance.inputUI.StopButtonCancelPower();
             merge.OrderDestruction();
             
         }
@@ -70,11 +85,13 @@ public class PowerHandler : MonoBehaviour
         if(confirmType == PowerConfirmType.Upgrade)
         {
             //
+            UIHandler.instance.inputUI.ChangeEspecificPowerAmmo(PowerType.Upgrade, -1);
+            UIHandler.instance.inputUI.StopButtonCancelPower();
             merge.OrderUpgrade();
         }
 
         Invoke(nameof(ResetConfirm), 0.3f);
-
+        
     }
 
 
@@ -88,6 +105,8 @@ public class PowerHandler : MonoBehaviour
         BallHandler ballHandler = GameHandler.instance.ballHandler;
         ballHandler.OnBallOrder(MergeBallType.Chicken, OrderWhoType.AllBelow, OrderWhatType.Destroy);
         Invoke(nameof(ResetConfirm), 0.3f);
+
+        UIHandler.instance.inputUI.ChangeEspecificPowerAmmo(PowerType.Wipe, -1);
     }
 
     public bool IsPowerActive()

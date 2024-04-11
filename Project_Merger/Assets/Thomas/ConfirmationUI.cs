@@ -19,7 +19,7 @@ public class ConfirmationUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI descriptionText;
     [SerializeField] GameObject buttonHolder;
 
-
+    [SerializeField] TextMeshProUGUI confirmText;
 
     bool inProcess = false;
 
@@ -60,6 +60,23 @@ public class ConfirmationUI : MonoBehaviour
 
     }
 
+    public void UpdateButton(bool hasAmmo)
+    {
+        //i will decide if it should show ""
+
+        if (hasAmmo)
+        {
+            confirmText.text = "Use";
+        }
+        else
+        {
+            confirmText.text = "Watch an ad";
+        }
+
+
+    }
+
+
 
     public void CloseConfirmationWindow()
     {
@@ -73,6 +90,7 @@ public class ConfirmationUI : MonoBehaviour
     {
         holder.SetActive(true);
         holder.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
 
         float timeForAnimation = 0.5f;
         holder.transform.DOScale(1, timeForAnimation);
@@ -112,5 +130,10 @@ public class ConfirmationUI : MonoBehaviour
         Debug.Log("force close was clicked");
         StopAllCoroutines();
         StartCoroutine(CloseProcess());
+    }
+
+    public bool IsActive()
+    {
+        return holder.activeInHierarchy;
     }
 }
